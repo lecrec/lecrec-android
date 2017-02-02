@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_corner_white"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_centerVertical="true"
+        android:orientation="vertical" >
+        <TextView
+            android:id="@+id/txtContent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/text_size_regular"
+            android:padding="30dp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"/>
+        <LinearLayout
+            android:id="@+id/llTypeTwo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnLeft"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="아니오"
+                android:padding="15dp"
+                android:background="@drawable/selector_corner_only_left_bottom_white"
+                android:textSize="@dimen/text_size_light"/>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray"/>
+            <Button
+                android:id="@+id/btnRight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="예"
+                android:padding="15dp"
+                android:background="@drawable/selector_corner_only_right_bottom_white"
+                android:textSize="@dimen/text_size_light" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llTypeOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <Button
+                android:id="@+id/btnOk"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="확인"
+                android:padding="15dp"
+                android:background="@drawable/selector_corner_only_bottom_white"
+                android:textSize="@dimen/text_size_light" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
