@@ -10,14 +10,18 @@ import com.kakao.auth.AuthType;
 import com.kakao.auth.IApplicationConfig;
 import com.kakao.auth.ISessionConfig;
 import com.kakao.auth.KakaoAdapter;
+import com.lecrec.lecrec.R;
 import com.lecrec.lecrec.consts.CONST;
 import com.lecrec.lecrec.consts.URL;
 import com.lecrec.lecrec.models.User;
 import com.lecrec.lecrec.services.UserService;
 import com.lecrec.lecrec.utils.helper.PrimitiveConverterFactory;
 
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 
 public class AppController extends Application {
@@ -51,6 +55,22 @@ public class AppController extends Application {
         SCREEN_WIDTH = displayMetrics.widthPixels;
         SCREEN_HEIGHT = displayMetrics.heightPixels;
         SCREEN_DENSITY = displayMetrics.density;
+
+        AndroidAudioConverter.load(this, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                // Great!
+            }
+            @Override
+            public void onFailure(Exception error) {
+                // FFmpeg is not supported by device
+            }
+        });
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
     }
 
     static{

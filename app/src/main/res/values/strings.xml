@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Lecrec</string>
+    <string name="facebook_app_id">698037910356409</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -8,6 +9,7 @@
 
     <string name="permission_title_rationale">권한 요청</string>
     <string name="permission_write_storage_rationale">사진, 미디어, 파일 사용 작업 수행을 허용하시겠습니까?</string>
+    <string name="permission_audio">오디오 녹음 작업 수행을 허용하시겠습니까?</string>
     <string name="label_ok">허용</string>
     <string name="label_cancel">거부</string>
 </resources>

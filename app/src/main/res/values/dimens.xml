@@ -12,4 +12,6 @@
     <dimen name="text_size_regular">14dp</dimen>
     <dimen name="text_size_bold">16dp</dimen>
     <dimen name="text_size_ultra_bold">18dp</dimen>
+
+    <dimen name="toolbar_height">48.5dp</dimen>
 </resources>
