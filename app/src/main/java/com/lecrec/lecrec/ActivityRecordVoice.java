@@ -10,7 +10,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +22,9 @@ import com.github.piasy.rxandroidaudio.AudioRecorder;
 import com.github.piasy.rxandroidaudio.PlayConfig;
 import com.github.piasy.rxandroidaudio.RxAudioPlayer;
 import com.lecrec.lecrec.custom.CustomActivityWithToolbar;
+import com.lecrec.lecrec.models.Record;
+import com.lecrec.lecrec.utils.AppController;
+import com.lecrec.lecrec.utils.Utils;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import org.androidannotations.annotations.AfterViews;
@@ -37,6 +43,12 @@ import java.util.TimerTask;
 import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
 import cafe.adriel.androidaudioconverter.model.AudioFormat;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -49,6 +61,12 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     FloatingActionButton fabRec;
     @ViewById
     TextView tvComplete, tvDurationCurrent;
+    @ViewById
+    RelativeLayout rlForm;
+    @ViewById
+    EditText edTitle;
+    @ViewById
+    RadioButton rbLangKor, rbLangEng;
     @ViewById
     DonutProgress donutProgress;
 
@@ -205,7 +223,63 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             case R.id.btnLeft:
                 finish();
                 break;
+            case R.id.btnOpenForm:
+                openForm();
+                break;
+            case R.id.btnSaveOnly:
+                createRecord(false);
+                break;
+            case R.id.btnSaveAndConvert:
+                createRecord(true);
+                break;
         }
+    }
+
+    void openForm() {
+        rlForm.setVisibility(View.VISIBLE);
+    }
+
+    void createRecord(boolean isConvert){
+        String title = edTitle.getText().toString();
+        //String duration = mRxAudioPlayer.getMediaPlayer().getDuration() + "";
+        String duration = "03:32";
+        String filename = mConvertedAudioFile.getName();
+        Boolean isKorean = false;
+        MultipartBody.Part body = null;
+        RequestBody description = null;
+
+        if(rbLangKor.isChecked()){
+            isKorean = true;
+        }
+
+        if(isConvert) {
+            RequestBody requestFile =
+                    RequestBody.create(
+                            MediaType.parse("audio/wave"),
+                            mConvertedAudioFile
+                    );
+
+            body = MultipartBody.Part.createFormData("voice", mConvertedAudioFile.getName(), requestFile);
+
+            String descriptionString = "hello, this is description speaking";
+            description = RequestBody.create(okhttp3.MultipartBody.FORM, descriptionString);
+        }
+
+        Call<Record> call = AppController.getRecordService().createRecord(AppController.USER_TOKEN, title, duration, filename, isKorean, description, body);
+        call.enqueue(new Callback<Record>() {
+            @Override
+            public void onResponse(Call<Record> call, Response<Record> response) {
+                Utils.showGlobalToast(ActivityRecordVoice.this, "저장되었습니다.");
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<Record> call, Throwable t) {
+                Utils.showGlobalToast(ActivityRecordVoice.this, "실패했습니다. 다시 시도해주세요.");
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+
     }
 
     @Override

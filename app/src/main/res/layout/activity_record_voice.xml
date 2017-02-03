@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:custom="http://schemas.android.com/apk/res-auto"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
@@ -12,6 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height"
         android:background="@drawable/bg_img_record_voice">
         <LinearLayout
             android:layout_width="match_parent"
@@ -96,6 +97,7 @@
             android:layout_alignParentBottom="true"
             android:visibility="invisible">
             <Button
+                android:id="@+id/btnSaveOnly"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
@@ -105,8 +107,10 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:textColor="@color/white"
                 android:layout_marginRight="5dp"
+                android:onClick="onClick"
                 style="@style/FontJua"/>
             <Button
+                android:id="@+id/btnOpenForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
@@ -116,7 +120,81 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:textColor="@color/colorPrimary"
                 android:layout_marginLeft="5dp"
+                android:onClick="onClick"
                 style="@style/FontJua"/>
         </LinearLayout>
     </RelativeLayout>
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/rlForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/trans_black"
+        android:visibility="gone">
+        <LinearLayout
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/bg_corner_top_blue"
+                android:text="녹음파일"
+                android:gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_bold"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_corner_bottom_white"
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <EditText
+                    android:id="@+id/edTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_bold"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:orientation="horizontal">
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+                        <RadioButton
+                            android:id="@+id/rbLangKor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="한글강의"
+                            android:checked="true"
+                            android:buttonTint="@color/colorPrimary"/>
+                        <RadioButton
+                            android:id="@+id/rbLangEng"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="영어강의"
+                            android:layout_marginLeft="10dp"
+                            android:buttonTint="@color/colorPrimary"/>
+                    </RadioGroup>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/btnSaveAndConvert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="확인"
+                    android:height="30dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:background="@drawable/bg_corner_blue_line"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:onClick="onClick"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -131,7 +131,6 @@ public class ActivityLaunchScreen extends CustomActivity {
     };
 
     private void register(final String socialId, String name){
-        Log.d("asdfsafasdf","asfasdf " + socialId + " / " + name);
         Call<User> call = AppController.getUserService().getUserOrCreate(socialId, name);
         call.enqueue(new CallUtils<User>(call) {
             @Override

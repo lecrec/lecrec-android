@@ -32,6 +32,7 @@ public interface RecordService {
             @Part("title") String title,
             @Part("duration") String duration,
             @Part("filename") String filename,
+            @Part("is_korean") Boolean isKorean,
             @Part("description") RequestBody description,
             @Part MultipartBody.Part file
     );

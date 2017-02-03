@@ -1,6 +1,7 @@
 package com.lecrec.lecrec;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.lecrec.lecrec.consts.CONST;
 import com.lecrec.lecrec.custom.CustomActivityWithRecyclerView;
 import com.lecrec.lecrec.models.Record;
 import com.lecrec.lecrec.utils.AppController;
@@ -39,25 +42,33 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
     LinearLayout llBgWrapper;
     @ViewById
     ImageView ivBgRecord;
+    @ViewById
+    TextView tvUsername;
 
     private int firstPosition = 0;
     private List<Record> items = new ArrayList<>();
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         isGridType = true;
         isShowDivider = false;
+        isInfiniteScroll = false;
 
         super.onCreate(savedInstanceState);
 
         if(adapter == null) {
             adapter = new RecyclerAdapterRecord(this, items);
         }
+
+        pref = getSharedPreferences(CONST.PREF_NAME, MODE_PRIVATE);
+        editor = pref.edit();
     }
 
     @AfterViews
     void afterViews(){
-        setToolbar("레크레크", 0, R.drawable.ic_menu_white_24dp, R.drawable.ic_folder_open_white_24dp, 0);
+        setToolbar("레크레크", 0, R.drawable.ic_menu_white_24dp, R.drawable.ic_note_add_white_24dp, 0);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -176,18 +187,16 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_logout) {
+            editor.putString("user_id", null);
+            editor.putString("user_token", null);
+            editor.putString("user_name", null);
+            AppController.USER_ID = null;
+            AppController.USER_TOKEN = null;
+            AppController.USER_NAME = null;
+            editor.commit();
+            finish();
+            startActivity(new Intent(ActivityMain.this, ActivityLaunchScreen_.class));
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

@@ -63,7 +63,12 @@ public class ActivityLectureDetail extends CustomActivityWithRecyclerView{
             public void onResponse(Call<Record> call, Response<Record> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     item = response.body();
-                    textObjects.addAll(item.getTextObjects());
+                    try{
+                        textObjects.addAll(item.getTextObjects());
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                     updateView();
                 }
             }
@@ -76,8 +81,6 @@ public class ActivityLectureDetail extends CustomActivityWithRecyclerView{
     }
 
     private void updateView() {
-        Log.d("asfasfsadf", "size : " + textObjects.size());
-        Log.d("asfasfsadf", "title : " + textObjects.get(0).getTitle());
         adapter.notifyDataSetChanged();
     }
 

@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ActivityMain_" />
-        <activity android:name=".ActivityRecordVoice_" />
+        <activity android:name=".ActivityRecordVoice_" android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity android:name=".ActivityLectureDetail_" />
         <activity
             android:name="com.facebook.FacebookActivity"
