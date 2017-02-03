@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:custom="http://schemas.android.com/apk/res-auto"
               android:background="@color/white"
               android:orientation="vertical">
     <include
@@ -10,20 +9,86 @@
         android:layout_height="wrap_content"/>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:paddingTop="5dp"
-            android:paddingBottom="50dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideOverlay"/>
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:background="@drawable/bg_img_detail_header">
+                    <ImageButton
+                        android:id="@+id/btnPlayPause"
+                        android:layout_toLeftOf="@+id/btnStop"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_play_arrow_white_24dp"
+                        android:background="@drawable/bg_circle_blue_white"
+                        android:padding="10dp"
+                        android:layout_marginRight="10dp"/>
+                    <ImageButton
+                        android:id="@+id/btnStop"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_stop_white_24dp"
+                        android:background="@drawable/bg_circle_blue_white"
+                        android:padding="10dp"
+                        android:layout_marginRight="10dp"/>
+                    <TextView
+                        android:id="@+id/tvDurationMaximum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/btnStop"
+                        android:textSize="@dimen/text_size_bold"
+                        android:text="30:22"
+                        android:textColor="@color/white"
+                        android:paddingTop="10dp"
+                        style="@style/FontJua"
+                        android:layout_marginRight="10dp"/>
+                    <TextView
+                        android:id="@+id/tvDurationCurrent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/btnStop"
+                        android:paddingTop="10dp"
+                        android:textSize="@dimen/text_size_bold"
+                        android:text="10:12"
+                        android:textColor="@color/colorPrimary"
+                        style="@style/FontJua"
+                        android:layout_marginRight="10dp"/>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@color/gray">
+                    <View
+                        android:id="@+id/progressBar"
+                        android:layout_width="50dp"
+                        android:layout_height="5dp"
+                        android:background="@color/colorPrimary" />
+                </RelativeLayout>
+            </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="100dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:clipToPadding="false"
+                android:scrollbarStyle="outsideOverlay"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -215,4 +215,41 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
         mAudioRecorder.stopRecord();
         mRxAudioPlayer.stopPlay();
     }
+ /*
+    private void uploadFile(Uri fileUri) {
+        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+        // use the FileUtils to get the actual file by uri
+
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(
+                        MediaType.parse(getContentResolver().getType(fileUri)),
+                        file
+                );
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+
+        // add another part within the multipart request
+        String descriptionString = "hello, this is description speaking";
+        RequestBody description =
+                RequestBody.create(
+                        okhttp3.MultipartBody.FORM, descriptionString);
+
+        // finally, execute the request
+        Call<ResponseBody> call = AppController.getRecordService().createRecord(description, body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v("Upload", "success");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+    }*/
 }

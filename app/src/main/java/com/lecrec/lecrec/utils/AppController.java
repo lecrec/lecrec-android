@@ -14,6 +14,7 @@ import com.lecrec.lecrec.R;
 import com.lecrec.lecrec.consts.CONST;
 import com.lecrec.lecrec.consts.URL;
 import com.lecrec.lecrec.models.User;
+import com.lecrec.lecrec.services.RecordService;
 import com.lecrec.lecrec.services.UserService;
 import com.lecrec.lecrec.utils.helper.PrimitiveConverterFactory;
 
@@ -33,12 +34,13 @@ public class AppController extends Application {
     public static float SCREEN_DENSITY = 0;
     public static User USER = null;
     public static String USER_ID = null;
-    public static String USER_MY_LIST_ID = null;
     public static String USER_TOKEN = null;
+    public static String USER_NAME = null;
 
     // retrofit and interface
     private static Retrofit retrofit;
     private static UserService userService;
+    private static RecordService recordService;
 
     @Override
     public void onCreate() {
@@ -49,6 +51,7 @@ public class AppController extends Application {
         if (USER_ID == null) {
             USER_ID = getSharedPreferences(CONST.PREF_NAME, MODE_PRIVATE).getString("user_id", null);
             USER_TOKEN = getSharedPreferences(CONST.PREF_NAME, MODE_PRIVATE).getString("user_token", null);
+            USER_NAME = getSharedPreferences(CONST.PREF_NAME, MODE_PRIVATE).getString("user_name", null);
         }
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
@@ -83,9 +86,11 @@ public class AppController extends Application {
                 .build();
 
         userService = retrofit.create(UserService.class);
+        recordService = retrofit.create(RecordService.class);
     }
 
     public static UserService getUserService(){ return userService; }
+    public static RecordService getRecordService(){ return recordService; }
 
     private static class KakaoSDKAdapter extends KakaoAdapter {
         @Override

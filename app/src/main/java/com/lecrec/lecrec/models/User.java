@@ -9,10 +9,12 @@ import java.io.Serializable;
 public class User implements Serializable {
     @JsonProperty("id")
     private String id;
-    @JsonProperty("user_id")
+    @JsonProperty("username")
     private String userId;
-    @JsonProperty("user_name")
+    @JsonProperty("first_name")
     private String userName;
+    @JsonProperty("token")
+    private String token;
 
     public String getId() {
         return id;
@@ -36,5 +38,13 @@ public class User implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

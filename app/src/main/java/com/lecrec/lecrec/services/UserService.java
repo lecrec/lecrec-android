@@ -2,14 +2,16 @@ package com.lecrec.lecrec.services;
 import com.lecrec.lecrec.models.User;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 
 
 public interface UserService {
-    @POST("login/")
-    Call<User> login(
-            @Query("user_id") String email,
-            @Query("password") String password
+    @FormUrlEncoded
+    @POST("users")
+    Call<User> getUserOrCreate(
+            @Field("username") String userId,
+            @Field("first_name") String userName
     );
 }

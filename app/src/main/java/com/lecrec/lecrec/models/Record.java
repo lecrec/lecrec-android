@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Record implements Serializable {
@@ -17,29 +18,18 @@ public class Record implements Serializable {
     private String filename;
     @JsonProperty("text")
     private String text;
+    @JsonProperty("text_json")
+    private List<TextObject> textObjects;
     @JsonProperty("duration")
     private String duration;
     @JsonProperty("updated")
     private String updated;
-    @JsonProperty("created")
-    private String created;
+    @JsonProperty("datetime")
+    private String datetime;
     @JsonProperty("is_uploaded")
     private Boolean isUploaded;
     @JsonProperty("is_converted")
     private Boolean isConverted;
-
-    public Record(String id, String title, String filename, String text, String duration, String updated, String created, Boolean isUploaded, Boolean isConverted, User user) {
-        this.id = id;
-        this.title = title;
-        this.filename = filename;
-        this.text = text;
-        this.duration = duration;
-        this.updated = updated;
-        this.created = created;
-        this.isUploaded = isUploaded;
-        this.isConverted = isConverted;
-        this.user = user;
-    }
 
     public String getId() {
         return id;
@@ -73,6 +63,15 @@ public class Record implements Serializable {
         this.filename = filename;
     }
 
+    public List<TextObject> getTextObjects() {
+        return textObjects;
+    }
+
+    public void setTextObjects(List<TextObject> textObjects) {
+        this.textObjects = textObjects;
+    }
+
+
     public String getText() {
         return text;
     }
@@ -97,12 +96,12 @@ public class Record implements Serializable {
         this.updated = updated;
     }
 
-    public String getCreated() {
-        return created;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setCreated(String created) {
-        this.created = created;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 
     public Boolean getUploaded() {

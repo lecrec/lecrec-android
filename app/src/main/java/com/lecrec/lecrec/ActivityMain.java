@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.lecrec.lecrec.custom.CustomActivityWithRecyclerView;
 import com.lecrec.lecrec.models.Record;
 import com.lecrec.lecrec.utils.AppController;
+import com.lecrec.lecrec.utils.CallUtils;
 import com.lecrec.lecrec.utils.adapter.RecyclerAdapterRecord;
 
 import org.androidannotations.annotations.AfterViews;
@@ -24,6 +25,9 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 @EActivity(R.layout.activity_main)
 public class ActivityMain extends CustomActivityWithRecyclerView implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,28 +53,6 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         if(adapter == null) {
             adapter = new RecyclerAdapterRecord(this, items);
         }
-
-        initTestRecords();
-    }
-
-    void initTestRecords() {
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
     }
 
     @AfterViews
@@ -124,16 +106,32 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
 
         if(page == 0)
             items.clear();
-
-        initTestRecords();
-        adapter.notifyDataSetChanged();
-
-        swipeRefreshLayout.post(new Runnable() {
+        Call<List<Record>> call = AppController.getRecordService().getRecords(AppController.USER_TOKEN);
+        call.enqueue(new CallUtils<List<Record>>(call) {
             @Override
-            public void run() {
+            public void onResponse(Call<List<Record>> call, Response<List<Record>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    items.addAll(response.body());
+                    updateView();
+                }
+                onComplete();
+            }
+
+            @Override
+            public void onFailure(Call<List<Record>> call, Throwable t) {
+                onComplete();
+                Log.e("LECREC", "ERROR GET RECORDS");
+            }
+
+            @Override
+            public void onComplete() {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    void updateView() {
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -152,8 +150,6 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             View view = recyclerView.getChildAt(0);
-            Log.d("aaaaaa", "top : " + view.getTop());
-            Log.d("aaaaaa", "now : " + mLinearLayoutManager.findFirstVisibleItemPosition());
             firstPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
             if (view != null && (firstPosition < 4 || (firstPosition == 4 && view.getTop() < -135))) {
                 llBgWrapper.setVisibility(View.VISIBLE);

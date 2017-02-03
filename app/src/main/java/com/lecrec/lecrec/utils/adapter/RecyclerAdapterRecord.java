@@ -66,7 +66,7 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
         }
 
         holder.tvTitle.setText(item.getTitle());
-        holder.tvCreated.setText(item.getCreated().substring(0, 10));
+        holder.tvCreated.setText(item.getDatetime());
         holder.tvDuration.setText(item.getDuration());
     }
 
