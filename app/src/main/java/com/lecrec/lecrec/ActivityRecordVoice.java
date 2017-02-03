@@ -3,6 +3,7 @@ package com.lecrec.lecrec;
 import android.Manifest;
 import android.content.res.ColorStateList;
 import android.media.MediaRecorder;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -73,7 +74,7 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     private TimeZone tz = TimeZone.getTimeZone("UTC");
     private SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private int elapsedTime = 0;
-    private Timer timer = new Timer();
+    private Timer timer;
     private AudioRecorder mAudioRecorder;
     private RxAudioPlayer mRxAudioPlayer;
     private File mAudioFile, mConvertedAudioFile;
@@ -152,8 +153,6 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             isRecording = false;
             stopTimer();
             fabRec.setVisibility(View.INVISIBLE);
-            tvComplete.setVisibility(View.VISIBLE);
-            llBottomBar.setVisibility(View.VISIBLE);
             mAudioRecorder.stopRecord();
             convertToWav();
         }
@@ -164,10 +163,9 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             @Override
             public void onSuccess(File convertedFile) {
                 mConvertedAudioFile = convertedFile;
-                Log.d("aaaaaaa", "success!!!!");
-                Log.d("aaaaaaa", "success!!!!" + convertedFile.getAbsolutePath());
-                Log.d("aaaaaaa", "success!!!!" + convertedFile.getName());
-                convertedPlay();
+                tvComplete.setVisibility(View.VISIBLE);
+                llBottomBar.setVisibility(View.VISIBLE);
+                initRxPlayer();
             }
             @Override
             public void onFailure(Exception error) {
@@ -181,19 +179,25 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
                 .convert();
     }
 
-    void convertedPlay() {
-        mRxAudioPlayer.play(PlayConfig.file(mConvertedAudioFile).looping(false).build())
+    void initRxPlayer(){
+        mRxAudioPlayer.play(PlayConfig.file(mConvertedAudioFile).looping(false).leftVolume(0F).rightVolume(0F).build())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Action1<Boolean>() {
                     @Override
-                    public void call(Boolean aBoolean) {
-                        Log.d("AAAAAA","finish converted!!!!!");
-                    }
+                    public void call(Boolean aBoolean) { }
                 });
-
+        new CountDownTimer(500, 100) {
+            public void onTick(long millisUntilFinished) { }
+            public void onFinish() {
+                if(mRxAudioPlayer.getMediaPlayer() != null) {
+                    mRxAudioPlayer.getMediaPlayer().stop();
+                }
+            }
+        }.start();
     }
 
     void startTimer() {
+        timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 elapsedTime += 1; //increase every sec
@@ -241,8 +245,10 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
 
     void createRecord(boolean isConvert){
         String title = edTitle.getText().toString();
-        //String duration = mRxAudioPlayer.getMediaPlayer().getDuration() + "";
-        String duration = "03:32";
+        String duration = "00:00:00";
+        if(mRxAudioPlayer.getMediaPlayer() != null) {
+            duration = df.format(new Date(mRxAudioPlayer.getMediaPlayer().getDuration()));
+        }
         String filename = mConvertedAudioFile.getName();
         Boolean isKorean = false;
         MultipartBody.Part body = null;
@@ -276,7 +282,8 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             @Override
             public void onFailure(Call<Record> call, Throwable t) {
                 Utils.showGlobalToast(ActivityRecordVoice.this, "실패했습니다. 다시 시도해주세요.");
-                Log.e("Upload error:", t.getMessage());
+                Log.e("Upload error:", "a : " + t.getMessage());
+                Log.e("Upload error:", "b : " + t.getStackTrace());
             }
         });
 
@@ -289,41 +296,4 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
         mAudioRecorder.stopRecord();
         mRxAudioPlayer.stopPlay();
     }
- /*
-    private void uploadFile(Uri fileUri) {
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
-
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse(getContentResolver().getType(fileUri)),
-                        file
-                );
-
-        // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
-
-        // add another part within the multipart request
-        String descriptionString = "hello, this is description speaking";
-        RequestBody description =
-                RequestBody.create(
-                        okhttp3.MultipartBody.FORM, descriptionString);
-
-        // finally, execute the request
-        Call<ResponseBody> call = AppController.getRecordService().createRecord(description, body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call,
-                                   Response<ResponseBody> response) {
-                Log.v("Upload", "success");
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-            }
-        });
-    }*/
 }

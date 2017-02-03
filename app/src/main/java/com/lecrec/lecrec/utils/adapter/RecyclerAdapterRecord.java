@@ -26,6 +26,7 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
         public final TextView tvTitle;
         public final TextView tvCreated;
         public final TextView tvDuration;
+        public final TextView tvConverting;
         public final ImageView ivUpload;
 
         public ViewHolder(View view) {
@@ -36,6 +37,7 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
             tvTitle = (TextView) view.findViewById(R.id.tvTitle);
             tvCreated = (TextView) view.findViewById(R.id.tvCreated);
             tvDuration = (TextView) view.findViewById(R.id.tvDuration);
+            tvConverting = (TextView) view.findViewById(R.id.tvConverting);
             ivUpload = (ImageView) view.findViewById(R.id.ivUpload);
         }
     }
@@ -59,10 +61,17 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
         holder.llRecordTop.setBackgroundResource(R.drawable.bg_record_corner_top);
         holder.llRecordBottom.setBackgroundResource(R.drawable.bg_record_corner_bottom);
         holder.ivUpload.setVisibility(View.VISIBLE);
-        if(item.getUploaded()) {
+        holder.tvConverting.setVisibility(View.GONE);
+        if (item.getConverted()) {
+            holder.llRecordTop.setBackgroundResource(R.drawable.bg_record_converted_corner_top);
+            holder.llRecordBottom.setBackgroundResource(R.drawable.bg_record_converted_corner_bottom);
+            holder.ivUpload.setVisibility(View.GONE);
+            holder.tvConverting.setVisibility(View.GONE);
+        } else if(item.getUploaded()) {
             holder.llRecordTop.setBackgroundResource(R.drawable.bg_record_uploaded_corner_top);
             holder.llRecordBottom.setBackgroundResource(R.drawable.bg_record_uploaded_corner_bottom);
-            holder.ivUpload.setVisibility(View.INVISIBLE);
+            holder.ivUpload.setVisibility(View.GONE);
+            holder.tvConverting.setVisibility(View.VISIBLE);
         }
 
         holder.tvTitle.setText(item.getTitle());

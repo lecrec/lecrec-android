@@ -31,7 +31,8 @@
                         android:src="@drawable/ic_play_arrow_white_24dp"
                         android:background="@drawable/bg_circle_blue_white"
                         android:padding="10dp"
-                        android:layout_marginRight="10dp"/>
+                        android:layout_marginRight="10dp"
+                        android:onClick="onClick"/>
                     <ImageButton
                         android:id="@+id/btnStop"
                         android:layout_alignParentRight="true"
@@ -40,7 +41,8 @@
                         android:src="@drawable/ic_stop_white_24dp"
                         android:background="@drawable/bg_circle_blue_white"
                         android:padding="10dp"
-                        android:layout_marginRight="10dp"/>
+                        android:layout_marginRight="10dp"
+                        android:onClick="onClick"/>
                     <TextView
                         android:id="@+id/tvDurationMaximum"
                         android:layout_width="wrap_content"
@@ -48,7 +50,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_below="@+id/btnStop"
                         android:textSize="@dimen/text_size_bold"
-                        android:text="30:22"
+                        android:text=""
                         android:textColor="@color/white"
                         android:paddingTop="10dp"
                         style="@style/FontJua"
@@ -60,7 +62,7 @@
                         android:layout_below="@+id/btnStop"
                         android:paddingTop="10dp"
                         android:textSize="@dimen/text_size_bold"
-                        android:text="10:12"
+                        android:text="00:00:00"
                         android:textColor="@color/colorPrimary"
                         style="@style/FontJua"
                         android:layout_marginRight="10dp"/>
@@ -69,11 +71,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
                     android:background="@color/gray">
-                    <View
+                    <ProgressBar
                         android:id="@+id/progressBar"
-                        android:layout_width="50dp"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
                         android:layout_height="5dp"
-                        android:background="@color/colorPrimary" />
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="0"/>
                 </RelativeLayout>
             </LinearLayout>
             <android.support.v7.widget.RecyclerView
@@ -108,6 +113,7 @@
                 android:drawablePadding="3dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:textColor="@color/white"
+                android:onClick="onClick"
                 style="@style/FontJua"/>
             <Button
                 android:id="@+id/btnEdit"
