@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lecrec.lecrec.R;
@@ -19,12 +21,22 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public final View mView;
-        public final TextView tvFilename;
+        public final LinearLayout llRecordTop;
+        public final LinearLayout llRecordBottom;
+        public final TextView tvTitle;
+        public final TextView tvCreated;
+        public final TextView tvDuration;
+        public final ImageView ivUpload;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            tvFilename = (TextView) view.findViewById(R.id.tvFilename);
+            llRecordTop = (LinearLayout) view.findViewById(R.id.llRecordTop);
+            llRecordBottom = (LinearLayout) view.findViewById(R.id.llRecordBottom);
+            tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+            tvCreated = (TextView) view.findViewById(R.id.tvCreated);
+            tvDuration = (TextView) view.findViewById(R.id.tvDuration);
+            ivUpload = (ImageView) view.findViewById(R.id.ivUpload);
         }
     }
 
@@ -44,7 +56,18 @@ public class RecyclerAdapterRecord extends RecyclerView.Adapter<RecyclerAdapterR
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Record item = mItems.get(position);
 
-        holder.tvFilename.setText(item.getFilename());
+        holder.llRecordTop.setBackgroundResource(R.drawable.bg_record_corner_top);
+        holder.llRecordBottom.setBackgroundResource(R.drawable.bg_record_corner_bottom);
+        holder.ivUpload.setVisibility(View.VISIBLE);
+        if(item.getUploaded()) {
+            holder.llRecordTop.setBackgroundResource(R.drawable.bg_record_uploaded_corner_top);
+            holder.llRecordBottom.setBackgroundResource(R.drawable.bg_record_uploaded_corner_bottom);
+            holder.ivUpload.setVisibility(View.INVISIBLE);
+        }
+
+        holder.tvTitle.setText(item.getTitle());
+        holder.tvCreated.setText(item.getCreated().substring(0, 10));
+        holder.tvDuration.setText(item.getDuration());
     }
 
     @Override
