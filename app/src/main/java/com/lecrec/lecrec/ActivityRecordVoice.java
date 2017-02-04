@@ -63,7 +63,7 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     @ViewById
     TextView tvComplete, tvDurationCurrent;
     @ViewById
-    RelativeLayout rlForm;
+    RelativeLayout rlForm, rlProgressBar;
     @ViewById
     EditText edTitle;
     @ViewById
@@ -125,8 +125,6 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
         if (!f.exists()) {
             f.mkdirs();
         }
-
-
     }
 
     boolean isInitRecorder, isRecording;
@@ -207,7 +205,9 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     }
 
     void stopTimer() {
-        timer.cancel();
+        if(timer != null) {
+            timer.cancel();
+        }
     }
 
     public Handler mHandler = new Handler() {
@@ -234,12 +234,16 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
                 createRecord(false);
                 break;
             case R.id.btnSaveAndConvert:
+                Utils.hideSoftKeyboard(this);
+                rlForm.setVisibility(View.GONE);
+                rlProgressBar.setVisibility(View.VISIBLE);
                 createRecord(true);
                 break;
         }
     }
 
     void openForm() {
+        Utils.showSoftKeyboard(this);
         rlForm.setVisibility(View.VISIBLE);
     }
 

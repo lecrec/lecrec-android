@@ -23,4 +23,8 @@
     <style name="FontNotoSans">
         <item name="fontPath">fonts/NotoSansCJKkr-DemiLight.otf</item>
     </style>
+
+    <style name="CircularProgress" parent="AppTheme">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
 </resources>

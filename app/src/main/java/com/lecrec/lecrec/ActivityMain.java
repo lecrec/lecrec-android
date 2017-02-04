@@ -86,9 +86,7 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         setupRecyclerView();
         super.setupSwipeRefreshLayout();
 
-        if(items.size() == 0) {
-            loadData(0);
-        }
+        loadData(0);
     }
 
     protected void setupRecyclerView(){
@@ -107,6 +105,14 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+        if(items.size() > 0) {
+            loadData(0);
+        }
+    }
+
+    @Override
     protected void loadData(int page) {
         swipeRefreshLayout.post(new Runnable() {
             @Override
@@ -117,6 +123,7 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
 
         if(page == 0)
             items.clear();
+
         Call<List<Record>> call = AppController.getRecordService().getRecords(AppController.USER_TOKEN);
         call.enqueue(new CallUtils<List<Record>>(call) {
             @Override

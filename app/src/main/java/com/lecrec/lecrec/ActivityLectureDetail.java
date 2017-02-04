@@ -190,6 +190,7 @@ public class ActivityLectureDetail extends CustomActivityWithRecyclerView {
     protected void onItemClick(View view, int position) {
         if(mRxAudioPlayer.getMediaPlayer() != null) {
             mRxAudioPlayer.getMediaPlayer().seekTo((int) Float.parseFloat(textObjects.get(position).getTime()) * 1000);
+            elapsedTime = mRxAudioPlayer.getMediaPlayer().getCurrentPosition() / 1000;
         }
     }
     
@@ -232,9 +233,6 @@ public class ActivityLectureDetail extends CustomActivityWithRecyclerView {
         public void handleMessage(Message msg) {
             if(mRxAudioPlayer.getMediaPlayer() != null) {
                 int position = (int)((mRxAudioPlayer.getMediaPlayer().getCurrentPosition()/(float)mRxAudioPlayer.getMediaPlayer().getDuration())*100);
-                Log.d("asdfasaf"," aaaa " + position);
-                Log.d("asdfasaf"," aaaa " + mRxAudioPlayer.getMediaPlayer().getCurrentPosition());
-                Log.d("asdfasaf"," aaaa " + mRxAudioPlayer.getMediaPlayer().getDuration());
                 progressBar.setProgress(position);
             }
             tvDurationCurrent.setText(df.format(new Date(elapsedTime  * 1000)));
@@ -244,7 +242,7 @@ public class ActivityLectureDetail extends CustomActivityWithRecyclerView {
     private void makeLink() throws KakaoParameterException {
         final KakaoLink kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
         final KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-        kakaoTalkLinkMessageBuilder.addWebLink("[필기셔틀 레크레크]" + item.getTitle() + "\r\n" + "http://211.249.62.164/?id=" + item.getId(), "http://211.249.62.164/?id=" + item.getId());
+        kakaoTalkLinkMessageBuilder.addWebLink("[필기셔틀 레크레크]" + item.getTitle() + "\r\n" + "http://211.249.62.164/index.html?id=" + item.getId(), "http://211.249.62.164/index.html?id=" + item.getId());
         kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder, this);
     }
 
