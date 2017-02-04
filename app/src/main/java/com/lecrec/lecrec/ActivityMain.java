@@ -1,6 +1,7 @@
 package com.lecrec.lecrec;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,10 +13,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.lecrec.lecrec.consts.CONST;
 import com.lecrec.lecrec.custom.CustomActivityWithRecyclerView;
 import com.lecrec.lecrec.models.Record;
 import com.lecrec.lecrec.utils.AppController;
+import com.lecrec.lecrec.utils.CallUtils;
 import com.lecrec.lecrec.utils.adapter.RecyclerAdapterRecord;
 
 import org.androidannotations.annotations.AfterViews;
@@ -24,6 +28,9 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 @EActivity(R.layout.activity_main)
 public class ActivityMain extends CustomActivityWithRecyclerView implements NavigationView.OnNavigationItemSelectedListener {
@@ -35,14 +42,19 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
     LinearLayout llBgWrapper;
     @ViewById
     ImageView ivBgRecord;
+    @ViewById
+    TextView tvUsername;
 
     private int firstPosition = 0;
     private List<Record> items = new ArrayList<>();
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         isGridType = true;
         isShowDivider = false;
+        isInfiniteScroll = false;
 
         super.onCreate(savedInstanceState);
 
@@ -50,32 +62,13 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
             adapter = new RecyclerAdapterRecord(this, items);
         }
 
-        initTestRecords();
-    }
-
-    void initTestRecords() {
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, true, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", false, false, null));
-        items.add(new Record("0", "모바일 UX 디자인 3주차", "mobile.m4a", "안녕하세요.", "44:21", "2017-02-04 12:00:12", "2017-02-04 12:00:12", true, false, null));
+        pref = getSharedPreferences(CONST.PREF_NAME, MODE_PRIVATE);
+        editor = pref.edit();
     }
 
     @AfterViews
     void afterViews(){
-        setToolbar("레크레크", 0, R.drawable.ic_menu_white_24dp, R.drawable.ic_folder_open_white_24dp, 0);
+        setToolbar("레크레크", 0, R.drawable.ic_menu_white_24dp, R.drawable.ic_note_add_white_24dp, 0);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -93,9 +86,7 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         setupRecyclerView();
         super.setupSwipeRefreshLayout();
 
-        if(items.size() == 0) {
-            loadData(0);
-        }
+        loadData(0);
     }
 
     protected void setupRecyclerView(){
@@ -114,6 +105,14 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+        if(items.size() > 0) {
+            loadData(0);
+        }
+    }
+
+    @Override
     protected void loadData(int page) {
         swipeRefreshLayout.post(new Runnable() {
             @Override
@@ -125,15 +124,32 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         if(page == 0)
             items.clear();
 
-        initTestRecords();
-        adapter.notifyDataSetChanged();
-
-        swipeRefreshLayout.post(new Runnable() {
+        Call<List<Record>> call = AppController.getRecordService().getRecords(AppController.USER_TOKEN);
+        call.enqueue(new CallUtils<List<Record>>(call) {
             @Override
-            public void run() {
+            public void onResponse(Call<List<Record>> call, Response<List<Record>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    items.addAll(response.body());
+                    updateView();
+                }
+                onComplete();
+            }
+
+            @Override
+            public void onFailure(Call<List<Record>> call, Throwable t) {
+                onComplete();
+                Log.e("LECREC", "ERROR GET RECORDS");
+            }
+
+            @Override
+            public void onComplete() {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    void updateView() {
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -152,8 +168,6 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             View view = recyclerView.getChildAt(0);
-            Log.d("aaaaaa", "top : " + view.getTop());
-            Log.d("aaaaaa", "now : " + mLinearLayoutManager.findFirstVisibleItemPosition());
             firstPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
             if (view != null && (firstPosition < 4 || (firstPosition == 4 && view.getTop() < -135))) {
                 llBgWrapper.setVisibility(View.VISIBLE);
@@ -180,18 +194,16 @@ public class ActivityMain extends CustomActivityWithRecyclerView implements Navi
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_logout) {
+            editor.putString("user_id", null);
+            editor.putString("user_token", null);
+            editor.putString("user_name", null);
+            AppController.USER_ID = null;
+            AppController.USER_TOKEN = null;
+            AppController.USER_NAME = null;
+            editor.commit();
+            finish();
+            startActivity(new Intent(ActivityMain.this, ActivityLaunchScreen_.class));
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ActivityMain_" />
-        <activity android:name=".ActivityRecordVoice_" />
+        <activity android:name=".ActivityRecordVoice_" android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity android:name=".ActivityLectureDetail_" />
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -45,6 +45,11 @@
             android:authorities="com.facebook.app.FacebookContentProvider575025609357607"
             android:exported="true">
         </provider>
+        <data android:scheme="@string/kakao_scheme"
+              android:host="@string/kakaolink_host" />
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
     </application>
 
 </manifest>

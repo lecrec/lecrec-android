@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/llTitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_ultra_bold"
+            style="@style/FontNanumBarunpen"
+            android:paddingTop="10dp"/>
+        <View
+            android:layout_width="150dp"
+            android:layout_height="3dp"
+            android:background="@color/colorPrimary"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+        <TextView
+            android:id="@+id/tvDatetime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_bold"
+            style="@style/FontNanumBarunpen"
+            android:paddingBottom="10dp"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_regular"
+        android:textColor="@color/black"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
+</LinearLayout>

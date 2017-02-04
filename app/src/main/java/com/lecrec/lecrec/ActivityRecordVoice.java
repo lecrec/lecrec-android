@@ -3,6 +3,7 @@ package com.lecrec.lecrec;
 import android.Manifest;
 import android.content.res.ColorStateList;
 import android.media.MediaRecorder;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -10,7 +11,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +23,9 @@ import com.github.piasy.rxandroidaudio.AudioRecorder;
 import com.github.piasy.rxandroidaudio.PlayConfig;
 import com.github.piasy.rxandroidaudio.RxAudioPlayer;
 import com.lecrec.lecrec.custom.CustomActivityWithToolbar;
+import com.lecrec.lecrec.models.Record;
+import com.lecrec.lecrec.utils.AppController;
+import com.lecrec.lecrec.utils.Utils;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import org.androidannotations.annotations.AfterViews;
@@ -37,6 +44,12 @@ import java.util.TimerTask;
 import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
 import cafe.adriel.androidaudioconverter.model.AudioFormat;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -50,12 +63,18 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     @ViewById
     TextView tvComplete, tvDurationCurrent;
     @ViewById
+    RelativeLayout rlForm, rlProgressBar;
+    @ViewById
+    EditText edTitle;
+    @ViewById
+    RadioButton rbLangKor, rbLangEng;
+    @ViewById
     DonutProgress donutProgress;
 
     private TimeZone tz = TimeZone.getTimeZone("UTC");
     private SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private int elapsedTime = 0;
-    private Timer timer = new Timer();
+    private Timer timer;
     private AudioRecorder mAudioRecorder;
     private RxAudioPlayer mRxAudioPlayer;
     private File mAudioFile, mConvertedAudioFile;
@@ -106,8 +125,6 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
         if (!f.exists()) {
             f.mkdirs();
         }
-
-
     }
 
     boolean isInitRecorder, isRecording;
@@ -134,8 +151,6 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             isRecording = false;
             stopTimer();
             fabRec.setVisibility(View.INVISIBLE);
-            tvComplete.setVisibility(View.VISIBLE);
-            llBottomBar.setVisibility(View.VISIBLE);
             mAudioRecorder.stopRecord();
             convertToWav();
         }
@@ -146,10 +161,9 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             @Override
             public void onSuccess(File convertedFile) {
                 mConvertedAudioFile = convertedFile;
-                Log.d("aaaaaaa", "success!!!!");
-                Log.d("aaaaaaa", "success!!!!" + convertedFile.getAbsolutePath());
-                Log.d("aaaaaaa", "success!!!!" + convertedFile.getName());
-                convertedPlay();
+                tvComplete.setVisibility(View.VISIBLE);
+                llBottomBar.setVisibility(View.VISIBLE);
+                initRxPlayer();
             }
             @Override
             public void onFailure(Exception error) {
@@ -163,19 +177,25 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
                 .convert();
     }
 
-    void convertedPlay() {
-        mRxAudioPlayer.play(PlayConfig.file(mConvertedAudioFile).looping(false).build())
+    void initRxPlayer(){
+        mRxAudioPlayer.play(PlayConfig.file(mConvertedAudioFile).looping(false).leftVolume(0F).rightVolume(0F).build())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Action1<Boolean>() {
                     @Override
-                    public void call(Boolean aBoolean) {
-                        Log.d("AAAAAA","finish converted!!!!!");
-                    }
+                    public void call(Boolean aBoolean) { }
                 });
-
+        new CountDownTimer(500, 100) {
+            public void onTick(long millisUntilFinished) { }
+            public void onFinish() {
+                if(mRxAudioPlayer.getMediaPlayer() != null) {
+                    mRxAudioPlayer.getMediaPlayer().stop();
+                }
+            }
+        }.start();
     }
 
     void startTimer() {
+        timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 elapsedTime += 1; //increase every sec
@@ -185,7 +205,9 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
     }
 
     void stopTimer() {
-        timer.cancel();
+        if(timer != null) {
+            timer.cancel();
+        }
     }
 
     public Handler mHandler = new Handler() {
@@ -205,7 +227,70 @@ public class ActivityRecordVoice extends CustomActivityWithToolbar implements Au
             case R.id.btnLeft:
                 finish();
                 break;
+            case R.id.btnOpenForm:
+                openForm();
+                break;
+            case R.id.btnSaveOnly:
+                createRecord(false);
+                break;
+            case R.id.btnSaveAndConvert:
+                Utils.hideSoftKeyboard(this);
+                rlForm.setVisibility(View.GONE);
+                rlProgressBar.setVisibility(View.VISIBLE);
+                createRecord(true);
+                break;
         }
+    }
+
+    void openForm() {
+        Utils.showSoftKeyboard(this);
+        rlForm.setVisibility(View.VISIBLE);
+    }
+
+    void createRecord(boolean isConvert){
+        String title = edTitle.getText().toString();
+        String duration = "00:00:00";
+        if(mRxAudioPlayer.getMediaPlayer() != null) {
+            duration = df.format(new Date(mRxAudioPlayer.getMediaPlayer().getDuration()));
+        }
+        String filename = mConvertedAudioFile.getName();
+        Boolean isKorean = false;
+        MultipartBody.Part body = null;
+        RequestBody description = null;
+
+        if(rbLangKor.isChecked()){
+            isKorean = true;
+        }
+
+        if(isConvert) {
+            RequestBody requestFile =
+                    RequestBody.create(
+                            MediaType.parse("audio/wave"),
+                            mConvertedAudioFile
+                    );
+
+            body = MultipartBody.Part.createFormData("voice", mConvertedAudioFile.getName(), requestFile);
+
+            String descriptionString = "hello, this is description speaking";
+            description = RequestBody.create(okhttp3.MultipartBody.FORM, descriptionString);
+        }
+
+        Call<Record> call = AppController.getRecordService().createRecord(AppController.USER_TOKEN, title, duration, filename, isKorean, description, body);
+        call.enqueue(new Callback<Record>() {
+            @Override
+            public void onResponse(Call<Record> call, Response<Record> response) {
+                Utils.showGlobalToast(ActivityRecordVoice.this, "저장되었습니다.");
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<Record> call, Throwable t) {
+                Utils.showGlobalToast(ActivityRecordVoice.this, "실패했습니다. 다시 시도해주세요.");
+                Log.e("Upload error:", "a : " + t.getMessage());
+                Log.e("Upload error:", "b : " + t.getStackTrace());
+            }
+        });
+
     }
 
     @Override

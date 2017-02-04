@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -23,7 +24,9 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.lecrec.lecrec.consts.CONST;
 import com.lecrec.lecrec.custom.CustomActivity;
+import com.lecrec.lecrec.models.User;
 import com.lecrec.lecrec.utils.AppController;
+import com.lecrec.lecrec.utils.CallUtils;
 import com.lecrec.lecrec.utils.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -33,6 +36,9 @@ import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 @EActivity(R.layout.activity_launch_screen)
 public class ActivityLaunchScreen extends CustomActivity {
@@ -46,7 +52,6 @@ public class ActivityLaunchScreen extends CustomActivity {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private CallbackManager callbackManager;
-    private String imageUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,12 @@ public class ActivityLaunchScreen extends CustomActivity {
         callbackManager = CallbackManager.Factory.create();
 
         if(AppController.USER_ID != null && AppController.USER_TOKEN != null) {
-            goActivityMain();
+            new CountDownTimer(1000, 100) {
+                public void onTick(long millisUntilFinished) { }
+                public void onFinish() {
+                    goActivityMain();
+                }
+            }.start();
         } else {
             changeToLoginView();
         }
@@ -96,28 +106,17 @@ public class ActivityLaunchScreen extends CustomActivity {
                     new GraphRequest.GraphJSONObjectCallback() {
                         @Override
                         public void onCompleted(JSONObject object, GraphResponse response) {
-                            String socialId = null, name = null, accessToken = null;
+                            String socialId = null, name = null;
                             try {
                                 socialId = object.getString("id");
                                 name = object.getString("name");
-                                accessToken = object.getString("access_token");
                             }catch (Exception e){}
 
-                            imageUrl = "http://graph.facebook.com/" + socialId + "/picture?type=large";
-
-                            if(accessToken == null)
-                                accessToken = socialId;
-
-                            register(
-                                    socialId,
-                                    name,
-                                    "FB",
-                                    accessToken
-                            );
+                            register(socialId, name);
                         }
                     });
             Bundle parameters = new Bundle();
-            parameters.putString("fields", "id,name,email,gender,birthday");
+            parameters.putString("fields", "id,name");
             request.setParameters(parameters);
             request.executeAsync();
         }
@@ -131,38 +130,36 @@ public class ActivityLaunchScreen extends CustomActivity {
         }
     };
 
-    private void register(final String socialId, String name, String socialType, final String accessToken){
-//
-//        Call<User> call = AppController.getAccountService().register(socialId, name, accessToken + "_p", "AN", socialId, socialType, accessToken, false);
-//        call.enqueue(new CallUtils<User>(call, this, getResources().getString(R.string.msgErrorCommon)) {
-//            @Override
-//            public void onResponse(Response<User> response) {
-//                if (response.isSuccess() && response.body() != null && response.body().getResult() != null) {
-//                    AppController.AUTHORIZATION = "JWT " + response.body().getToken();
-//
-//                    editor.putString("authorization", response.body().getToken());
-//                    editor.putString("email", socialId);
-//                    editor.putString("password", accessToken + "_p");
-//                    editor.putBoolean("is_social", true);
-//                    editor.apply();
-//
-//                    if (response.body().getType().equals("login") || response.body().getType().equals("registration")) {
-//                        if (pref.getBoolean(CONST.PREF_AGREE + socialId, false)) {
-//                            getUser(GO_MAIN);
-//                        } else {
-//                            getUser(GO_AGREEMENT);
-//                        }
-//                    } else {
-//                        super.showSingleDialog(msg);
-//                    }
-//                } else {
-//                    facebookLogout();
-//                    super.showSingleDialog(msg);
-//                }
-//            }
-//        });
+    private void register(final String socialId, String name){
+        Call<User> call = AppController.getUserService().getUserOrCreate(socialId, name);
+        call.enqueue(new CallUtils<User>(call) {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    AppController.USER_ID = response.body().getUserId();
+                    AppController.USER_TOKEN = "JWT " + response.body().getToken();
+                    AppController.USER_NAME = response.body().getUserName();
+
+                    saveUserDataAndGoNext();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e("LECREC", "ERROR SOCIAL LOGIN : " + t.getMessage());
+                Log.e("LECREC", "ERROR SOCIAL LOGIN : " + t.getStackTrace());
+            }
+        });
     }
 
+    private void saveUserDataAndGoNext(){
+        editor.putString("user_id", AppController.USER_ID);
+        editor.putString("user_token", AppController.USER_TOKEN);
+        editor.putString("user_name", AppController.USER_NAME);
+        editor.commit();
+
+        goActivityMain();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -171,17 +168,8 @@ public class ActivityLaunchScreen extends CustomActivity {
     }
 
     void goActivityMain() {
-        new CountDownTimer(1000, 100) {
-            public void onTick(long millisUntilFinished) {
-                //nothing
-            }
-
-            public void onFinish() {
-                startActivity(new Intent(ActivityLaunchScreen.this, ActivityMain_.class));
-                finish();
-            }
-        }.start();
-
+        startActivity(new Intent(ActivityLaunchScreen.this, ActivityMain_.class));
+        finish();
     }
 
     void changeToLoginView() {
@@ -211,7 +199,6 @@ public class ActivityLaunchScreen extends CustomActivity {
 
     @Click(R.id.btnKakao)
     void clickKakao() {
-        startActivity(new Intent(ActivityLaunchScreen.this, ActivityMain_.class));
-        finish();
+        goActivityMain();
     }
 }
